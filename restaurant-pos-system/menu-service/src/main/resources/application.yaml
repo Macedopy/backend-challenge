@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: menu-service
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: menu_service
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+  server:
+    port: 8080
