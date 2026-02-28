@@ -1,15 +1,30 @@
 spring:
   application:
     name: order-service
+
   data:
     mongodb:
-      host: localhost
-      port: 27017
-      database: order_service
+      uri: mongodb://mongodb:27017/posdb   # mesmo banco
+
   rabbitmq:
-    host: localhost
+    host: rabbitmq
     port: 5672
     username: guest
     password: guest
+
   server:
-    port: 8081
+    port: 8080
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: DEBUG
+    org.springframework.web.servlet: DEBUG
+    org.springframework.data.mongodb: DEBUG
+    org.springframework.data.mongodb.core: DEBUG
+    org.mongodb.driver: DEBUG
+    org.springframework.amqp: DEBUG     # RabbitMQ (publish e consume)
+    org.springframework.amqp.rabbit: DEBUG
+    com.restaurant.pos.orderservice: DEBUG   # seu pacote raiz
+    feign: DEBUG                        # importante: chamada para menu-service via Feign
+    org.springframework.cloud.openfeign: DEBUG   # se usar Feign

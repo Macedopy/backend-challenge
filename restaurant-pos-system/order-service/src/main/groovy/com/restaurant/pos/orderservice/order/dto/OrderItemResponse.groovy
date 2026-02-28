@@ -1,7 +1,11 @@
+package com.restaurant.pos.orderservice.order.dto
+
+import groovy.transform.Canonical
+
 @Canonical
 class OrderItemResponse {
     String productId
     String name
-    int quantity
+    Integer quantity
     BigDecimal price
 }

@@ -1,4 +1,4 @@
-package com.restaurant.pos.menuservice.dto
+package com.restaurant.pos.menuservice.menu.dto
 
 import groovy.transform.Canonical
 import jakarta.validation.constraints.NotBlank

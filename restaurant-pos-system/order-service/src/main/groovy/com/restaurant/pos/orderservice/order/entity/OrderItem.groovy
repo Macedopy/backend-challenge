@@ -1,4 +1,4 @@
-package com.restaurant.pos.orderservice.order
+package com.restaurant.pos.orderservice.order.entity
 
 import groovy.transform.Canonical
 

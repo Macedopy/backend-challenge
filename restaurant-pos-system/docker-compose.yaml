@@ -8,6 +8,8 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: posdb
 
   rabbitmq:
     image: rabbitmq:3.13-management
@@ -17,6 +19,32 @@ services:
       - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+
+  menu-service:
+    build: ./menu-service
+    container_name: pos-menu-service
+    ports:
+      - "8081:8080"
+    depends_on:
+      - mongodb
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/posdb
+      SPRING_PROFILES_ACTIVE: docker
+
+  order-service:
+    build: ./order-service
+    container_name: pos-order-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+      - rabbitmq
+      - menu-service
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/posdb
+      SPRING_RABBITMQ_HOST: rabbitmq
+      MENU_SERVICE_BASE_URL: http://menu-service:8080
+      SPRING_PROFILES_ACTIVE: docker
 
 volumes:
   mongodb_data:

@@ -1,5 +1,9 @@
+package com.restaurant.pos.menuservice.menu.dto
+
+import groovy.transform.Canonical
+
 @Canonical
 class MenuItemListResponse {
-    List<MenuItemResponse> items = []
+    List<MenuItemCreateResponse> items = []
     long totalRecords
 }
