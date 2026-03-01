@@ -12,14 +12,17 @@ import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Service
 @CompileStatic
 class MenuService {
 
-    private final MenuItemRepository repository
+    private final MenuRepository repository
 
-    MenuService(MenuItemRepository repository) {
+    private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+
+    MenuService(MenuRepository repository) {
         this.repository = repository
     }
 
@@ -79,7 +82,7 @@ class MenuService {
                 name: item.name,
                 description: item.description,
                 price: item.price,
-                createdAt: item.createdAt?.toString()
+                createdAt: item.createdAt?.format(ISO_FORMATTER)
         )
     }
 
@@ -89,7 +92,7 @@ class MenuService {
                 name: item.name,
                 description: item.description,
                 price: item.price,
-                updatedAt: item.updatedAt?.toString()
+                updatedAt: item.updatedAt?.format(ISO_FORMATTER)
         )
     }
 }

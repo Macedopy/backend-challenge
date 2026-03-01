@@ -4,20 +4,19 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://mongodb:27017/posdb   # único banco
+      uri: mongodb://mongodb:27017/posdb
 
   server:
     port: 8080
 
 logging:
   level:
-    root: INFO                          # nível padrão
-    org.springframework.web: DEBUG      # controllers, requests, argumentos de métodos
+    root: INFO
+    org.springframework.web: DEBUG
     org.springframework.web.servlet: DEBUG
-    org.springframework.data.mongodb: DEBUG   # queries MongoDB, inserts, finds
+    org.springframework.data.mongodb: DEBUG
     org.springframework.data.mongodb.core: DEBUG
-    org.mongodb.driver: DEBUG           # driver MongoDB puro (conexão, autenticação)
-    org.springframework.validation: DEBUG   # validações @Valid
-    com.restaurant.pos.menuservice: DEBUG   # seu pacote raiz (ajuste se o pacote for diferente)
-    # Se usar Feign ou RestTemplate (mas no menu-service provavelmente não usa)
+    org.mongodb.driver: DEBUG
+    org.springframework.validation: DEBUG
+    com.restaurant.pos.menuservice: DEBUG
     feign: DEBUG

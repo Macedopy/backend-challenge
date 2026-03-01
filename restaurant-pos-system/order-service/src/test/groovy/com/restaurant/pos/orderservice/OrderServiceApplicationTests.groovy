@@ -1,13 +1,18 @@
 package com.restaurant.pos.orderservice
 
-import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.SpringApplication
+import spock.lang.Specification
 
-@SpringBootTest
-class OrderServiceApplicationTests {
+class OrderServiceApplicationTest extends Specification {
 
-	@Test
-	void contextLoads() {
-	}
+    def "should call SpringApplication run"() {
+        given:
+        GroovyMock(SpringApplication, global: true)
 
+        when:
+        OrderServiceApplication.main()
+
+        then:
+        1 * SpringApplication.run(OrderServiceApplication, _ as String[])
+    }
 }

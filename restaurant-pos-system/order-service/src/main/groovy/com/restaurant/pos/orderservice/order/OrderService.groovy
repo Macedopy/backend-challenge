@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Service
 @CompileStatic
@@ -25,6 +26,8 @@ class OrderService {
     private final OrderRepository repository
     private final MenuItemClient menuItemClient
     private final RabbitTemplate rabbitTemplate
+
+    private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
     OrderService(OrderRepository repository, MenuItemClient menuItemClient, RabbitTemplate rabbitTemplate) {
         this.repository = repository
@@ -103,8 +106,8 @@ class OrderService {
                 orderItems: order.orderItems.collect { new OrderItemResponse(productId: it.productId, name: it.name, quantity: it.quantity, price: it.price) },
                 totalAmount: order.totalAmount,
                 status: order.status,
-                createdAt: order.createdAt?.toString(),
-                updatedAt: order.updatedAt?.toString()
+                createdAt: order.createdAt?.format(ISO_FORMATTER),
+                updatedAt: order.updatedAt?.format(ISO_FORMATTER)
         )
     }
 

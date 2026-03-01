@@ -4,7 +4,7 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://mongodb:27017/posdb   # mesmo banco
+      uri: mongodb://mongodb:27017/posdb
 
   rabbitmq:
     host: rabbitmq
@@ -23,8 +23,8 @@ logging:
     org.springframework.data.mongodb: DEBUG
     org.springframework.data.mongodb.core: DEBUG
     org.mongodb.driver: DEBUG
-    org.springframework.amqp: DEBUG     # RabbitMQ (publish e consume)
+    org.springframework.amqp: DEBUG
     org.springframework.amqp.rabbit: DEBUG
-    com.restaurant.pos.orderservice: DEBUG   # seu pacote raiz
-    feign: DEBUG                        # importante: chamada para menu-service via Feign
-    org.springframework.cloud.openfeign: DEBUG   # se usar Feign
+    com.restaurant.pos.orderservice: DEBUG
+    feign: DEBUG
+    org.springframework.cloud.openfeign: DEBUG

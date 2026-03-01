@@ -10,11 +10,11 @@ class OrderStatusListener {
 
     @RabbitListener(queues = "order.status.updated")
     void handleOrderStatusUpdate(Map message) {
-        println "Notificação simulada:"
-        println "Pedido: ${message.orderId}"
+        println "Notification:"
+        println "Order: ${message.orderId}"
         println "Status: ${message.status}"
-        println "Cliente: ${message.fullName}"
-        println "Endereço: ${message.address}"
+        println "Client: ${message.fullName}"
+        println "Address: ${message.address}"
         println "Email: ${message.email}"
         println "---------------------"
     }
