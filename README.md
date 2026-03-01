@@ -26,10 +26,10 @@ All services run inside Docker containers:
 
 | Container | Description |
 |---|---|
-| `menu-service` | Menu management API |
-| `order-service` | Order management API + RabbitMQ integration |
+| `menu-service` | Menu management API (port 8081) |
+| `order-service` | Order management API + RabbitMQ integration (port 8080) |
 | `mongodb` | Shared MongoDB instance |
-| `rabbitmq` | Message broker |
+| `rabbitmq` | Message broker (management UI on port 15672) |
 
 ---
 
@@ -71,43 +71,55 @@ This will spin up all four containers: `menu-service`, `order-service`, `mongodb
 
 ---
 
-## Testing the API
+## API Examples
 
-Import the provided Insomnia collection file into [Insomnia](https://insomnia.rest):
+You can import the provided Insomnia collection file `backend-challenge-request-example` directly into [Insomnia](https://insomnia.rest) to get all requests ready to use.
 
-1. Open Insomnia
-2. Click **Import** → select the file `backend-challenge-request-example`
-3. The collection will load with all endpoints for both **Menu** and **Order** services
+### Menu Service
 
-Alternatively, use the curl examples below.
-
-### Menu Service — curl Examples
-
+**Create Menu Item**
 ```bash
-# Create a menu item
 curl -X POST http://localhost:8081/menu-items \
   -H "Content-Type: application/json" \
-  -d '{"name": "Pizza", "description": "Delicious cheese pizza", "price": 9.99}'
+  -d '{
+    "name": "Pizza",
+    "description": "Delicious cheese pizza",
+    "price": 9.99
+  }'
+```
 
-# Get all menu items
-curl http://localhost:8081/menu-items?limit=10&offset=0
-
-# Get menu item by ID
-curl http://localhost:8081/menu-items/{id}
-
-# Update a menu item
+**Update Menu Item**
+```bash
 curl -X PUT http://localhost:8081/menu-items/{id} \
   -H "Content-Type: application/json" \
-  -d '{"name": "Large Pizza", "description": "Cheese pizza with extra toppings", "price": 11.99}'
+  -d '{
+    "name": "Large Pizza",
+    "description": "Cheese pizza with extra toppings",
+    "price": 11.99
+  }'
+```
 
-# Delete a menu item
+**Delete Menu Item**
+```bash
 curl -X DELETE http://localhost:8081/menu-items/{id}
 ```
 
-### Order Service — curl Examples
-
+**Get All Menu Items (Paginated)**
 ```bash
-# Create an order
+curl http://localhost:8081/menu-items?limit=10&offset=0
+```
+
+**Get Menu Item by ID**
+```bash
+curl http://localhost:8081/menu-items/{id}
+```
+
+---
+
+### Order Service
+
+**Create Order**
+```bash
 curl -X POST http://localhost:8080/orders \
   -H "Content-Type: application/json" \
   -d '{
@@ -117,20 +129,29 @@ curl -X POST http://localhost:8080/orders \
       "email": "john@example.com"
     },
     "orderItems": [
-      { "productId": "{menu-item-id}", "quantity": 2 }
+      { "productId": "abc123", "quantity": 2 },
+      { "productId": "xyz456", "quantity": 1 }
     ]
   }'
+```
 
-# Update order status
+**Update Order Status**
+```bash
 curl -X PATCH http://localhost:8080/orders/{id}/status \
   -H "Content-Type: application/json" \
-  -d '{"status": "PREPARING"}'
+  -d '{
+    "status": "PREPARING"
+  }'
+```
 
-# Get order by ID
-curl http://localhost:8080/orders/{id}
-
-# Get order history
+**Get Order History (Paginated)**
+```bash
 curl http://localhost:8080/orders?limit=10&offset=0
+```
+
+**Get Order by ID**
+```bash
+curl http://localhost:8080/orders/{id}
 ```
 
 ---

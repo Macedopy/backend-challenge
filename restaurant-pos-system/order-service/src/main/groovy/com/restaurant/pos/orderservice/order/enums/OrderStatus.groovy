@@ -6,5 +6,6 @@ import groovy.transform.CompileStatic
 enum OrderStatus {
     CREATED,
     PREPARING,
+    READY,
     DELIVERED
 }
