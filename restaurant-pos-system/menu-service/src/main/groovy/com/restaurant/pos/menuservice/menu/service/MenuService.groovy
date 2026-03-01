@@ -1,10 +1,13 @@
-package com.restaurant.pos.menuservice.menu
+package com.restaurant.pos.menuservice.menu.service
 
 import com.restaurant.pos.menuservice.menu.dto.MenuItemRequest
 import com.restaurant.pos.menuservice.menu.dto.MenuItemCreateResponse
 import com.restaurant.pos.menuservice.menu.dto.MenuItemUpdateResponse
 import com.restaurant.pos.menuservice.menu.dto.MenuItemListResponse
 import com.restaurant.pos.menuservice.menu.entity.MenuItem
+import com.restaurant.pos.menuservice.menu.repository.MenuRepository
+import com.restaurant.pos.menuservice.menu.exception.MenuItemAlreadyExistsException
+import com.restaurant.pos.menuservice.menu.exception.MenuItemNotFoundException
 import groovy.transform.CompileStatic
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -15,7 +18,6 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Service
-@CompileStatic
 class MenuService {
 
     private final MenuRepository repository
@@ -27,6 +29,10 @@ class MenuService {
     }
 
     MenuItemCreateResponse create(MenuItemRequest request) {
+        if (repository.existsByName(request.name)) {
+            throw new MenuItemAlreadyExistsException(request.name)
+        }
+
         def now = LocalDateTime.now()
         def item = new MenuItem(
                 name: request.name,
@@ -41,7 +47,7 @@ class MenuService {
 
     MenuItemUpdateResponse update(String id, MenuItemRequest request) {
         def item = repository.findById(id)
-                .orElseThrow { new RuntimeException("Menu item not found with id: $id") }
+                .orElseThrow { new MenuItemNotFoundException(id) }
 
         item.name = request.name
         item.description = request.description
@@ -53,15 +59,14 @@ class MenuService {
     }
 
     void delete(String id) {
-        if (!repository.existsById(id)) {
-            throw new RuntimeException("Menu item not found with id: $id")
-        }
-        repository.deleteById(id)
+        def item = repository.findById(id)
+                .orElseThrow { new MenuItemNotFoundException(id) }
+        repository.delete(item)
     }
 
     MenuItemCreateResponse findById(String id) {
         def item = repository.findById(id)
-                .orElseThrow { new RuntimeException("Menu item not found with id: $id") }
+                .orElseThrow { new MenuItemNotFoundException(id) }
         toCreateResponse(item)
     }
 

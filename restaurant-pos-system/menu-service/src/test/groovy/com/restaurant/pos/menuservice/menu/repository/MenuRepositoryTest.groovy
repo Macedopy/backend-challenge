@@ -1,6 +1,6 @@
 package com.restaurant.pos.menuservice.menu.repository
 
-import com.restaurant.pos.menuservice.menu.MenuRepository
+import com.restaurant.pos.menuservice.menu.repository.MenuRepository
 import com.restaurant.pos.menuservice.menu.entity.MenuItem
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest

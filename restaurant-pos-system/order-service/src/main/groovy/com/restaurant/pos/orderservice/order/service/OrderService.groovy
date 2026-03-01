@@ -1,12 +1,15 @@
-package com.restaurant.pos.orderservice.order
+package com.restaurant.pos.orderservice.order.service
 
 import com.restaurant.pos.orderservice.order.dto.OrderRequest
 import com.restaurant.pos.orderservice.order.dto.OrderResponse
 import com.restaurant.pos.orderservice.order.dto.OrderItemResponse
 import com.restaurant.pos.orderservice.order.dto.OrderStatusUpdateRequest
+import com.restaurant.pos.orderservice.order.repository.OrderRepository
 import com.restaurant.pos.orderservice.order.entity.Order
 import com.restaurant.pos.orderservice.order.entity.OrderItem
 import com.restaurant.pos.orderservice.order.enums.OrderStatus
+import com.restaurant.pos.orderservice.order.exception.MenuItemUnavailableException
+import com.restaurant.pos.orderservice.order.exception.OrderNotFoundException
 import com.restaurant.pos.orderservice.order.integration.MenuItemClient
 import com.restaurant.pos.orderservice.shared.config.RabbitMQConfig
 import groovy.transform.CompileStatic
@@ -66,7 +69,7 @@ class OrderService {
 
     OrderResponse updateStatus(String id, OrderStatusUpdateRequest request) {
         def order = repository.findById(id)
-                .orElseThrow { new RuntimeException("Order not found: $id") }
+                .orElseThrow { new OrderNotFoundException(id) }
 
         order.status = request.status
         order.updatedAt = LocalDateTime.now()
@@ -80,7 +83,7 @@ class OrderService {
 
     OrderResponse findById(String id) {
         def order = repository.findById(id)
-                .orElseThrow { new RuntimeException("Order not found: $id") }
+                .orElseThrow { new OrderNotFoundException(id) }
         toResponse(order)
     }
 
@@ -92,9 +95,9 @@ class OrderService {
         def orders = page.content.collect { toResponse(it) }
 
         [
-                orders: orders,
-                limit: limit,
-                offset: offset,
+                orders      : orders,
+                limit       : limit,
+                offset      : offset,
                 totalRecords: page.totalElements
         ]
     }
@@ -113,11 +116,11 @@ class OrderService {
 
     private void publishNotification(Order order) {
         def message = [
-                orderId: order.id,
-                status: order.status.name(),
+                orderId : order.id,
+                status  : order.status.name(),
                 fullName: order.customer.fullName,
-                address: order.customer.address,
-                email: order.customer.email
+                address : order.customer.address,
+                email   : order.customer.email
         ]
         rabbitTemplate.convertAndSend(RabbitMQConfig.ORDER_STATUS_QUEUE, message)
     }

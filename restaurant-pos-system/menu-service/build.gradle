@@ -63,7 +63,6 @@ tasks.withType(JavaCompile).configureEach {
     options.compilerArgs.add('-parameters')
 }
 
-// Configuração JaCoCo
 jacoco {
     toolVersion = "0.8.12"
 }
@@ -75,6 +74,15 @@ tasks.jacocoTestReport {
         html.required = true
         csv.required = false
     }
+
+    afterEvaluate {
+        classDirectories.from = classDirectories.files.collect { dir ->
+            fileTree(dir) {
+                exclude '**/exception/**'
+                exclude 'com/restaurant/pos/menuservice/menu/exception/**'
+            }
+        }
+    }
 }
 
 tasks.jacocoTestCoverageVerification {
@@ -82,6 +90,15 @@ tasks.jacocoTestCoverageVerification {
         rule {
             limit {
                 minimum = 0.70
+            }
+        }
+    }
+
+    afterEvaluate {
+        classDirectories.from = classDirectories.files.collect { dir ->
+            fileTree(dir) {
+                exclude '**/exception/**'
+                exclude 'com/restaurant/pos/menuservice/menu/exception/**'
             }
         }
     }

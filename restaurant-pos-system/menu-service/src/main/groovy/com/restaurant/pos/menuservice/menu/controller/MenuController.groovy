@@ -1,9 +1,10 @@
-package com.restaurant.pos.menuservice.menu
+package com.restaurant.pos.menuservice.menu.controller
 
 import com.restaurant.pos.menuservice.menu.dto.MenuItemRequest
 import com.restaurant.pos.menuservice.menu.dto.MenuItemCreateResponse
 import com.restaurant.pos.menuservice.menu.dto.MenuItemUpdateResponse
 import com.restaurant.pos.menuservice.menu.dto.MenuItemListResponse
+import com.restaurant.pos.menuservice.menu.service.MenuService
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

@@ -1,8 +1,8 @@
 package com.restaurant.pos.menuservice.menu.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.restaurant.pos.menuservice.menu.MenuController
-import com.restaurant.pos.menuservice.menu.MenuService
+import com.restaurant.pos.menuservice.menu.controller.MenuController
+import com.restaurant.pos.menuservice.menu.service.MenuService
 import com.restaurant.pos.menuservice.menu.dto.MenuItemRequest
 import com.restaurant.pos.menuservice.menu.dto.MenuItemCreateResponse
 import com.restaurant.pos.menuservice.menu.dto.MenuItemUpdateResponse

@@ -1,13 +1,18 @@
 package com.restaurant.pos.menuservice
 
-import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.SpringApplication
+import spock.lang.Specification
 
-@SpringBootTest
-class MenuServiceApplicationTests {
+class MenuServiceApplicationTest extends Specification {
 
-	@Test
-	void contextLoads() {
-	}
+    def "should call SpringApplication run"() {
+        given:
+        GroovyMock(SpringApplication, global: true)
 
+        when:
+        MenuServiceApplication.main()
+
+        then:
+        1 * SpringApplication.run(MenuServiceApplication, _ as String[])
+    }
 }

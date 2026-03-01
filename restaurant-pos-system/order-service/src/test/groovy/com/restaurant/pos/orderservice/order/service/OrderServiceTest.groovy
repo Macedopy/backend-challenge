@@ -1,7 +1,7 @@
 package com.restaurant.pos.orderservice.order.service
 
-import com.restaurant.pos.orderservice.order.OrderRepository
-import com.restaurant.pos.orderservice.order.OrderService
+import com.restaurant.pos.orderservice.order.repository.OrderRepository
+import com.restaurant.pos.orderservice.order.service.OrderService
 import com.restaurant.pos.orderservice.order.dto.CustomerDto
 import com.restaurant.pos.orderservice.order.dto.OrderItemRequest
 import com.restaurant.pos.orderservice.order.dto.OrderRequest

@@ -1,51 +1,44 @@
 package com.restaurant.pos.menuservice.menu.service
 
-import com.restaurant.pos.menuservice.menu.MenuService
-import com.restaurant.pos.menuservice.menu.MenuRepository
+import com.restaurant.pos.menuservice.menu.repository.MenuRepository
 import com.restaurant.pos.menuservice.menu.dto.MenuItemRequest
 import com.restaurant.pos.menuservice.menu.dto.MenuItemCreateResponse
 import com.restaurant.pos.menuservice.menu.dto.MenuItemUpdateResponse
 import com.restaurant.pos.menuservice.menu.dto.MenuItemListResponse
 import com.restaurant.pos.menuservice.menu.entity.MenuItem
-import org.springframework.data.domain.Page
+import com.restaurant.pos.menuservice.menu.exception.MenuItemAlreadyExistsException
+import com.restaurant.pos.menuservice.menu.exception.MenuItemNotFoundException
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import spock.lang.Specification
 import spock.lang.Subject
 
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 class MenuServiceTest extends Specification {
 
     @Subject
     MenuService menuService
 
-    MenuRepository menuRepository = Stub(MenuRepository)
+    MenuRepository menuRepository = Mock(MenuRepository)
 
     def setup() {
         menuService = new MenuService(menuRepository)
     }
 
-    def "should create a new menu item successfully"() {
+    def "should create menu item successfully"() {
         given:
         def request = new MenuItemRequest(name: "Pizza", description: "Delicious cheese pizza", price: 9.99)
         def now = LocalDateTime.now()
-        def savedItem = new MenuItem(
-            id: "abc123",
-            name: request.name,
-            description: request.description,
-            price: request.price,
-            createdAt: now,
-            updatedAt: now
-        )
+        def savedItem = new MenuItem(id: "abc123", name: "Pizza", description: "Delicious cheese pizza", price: 9.99, createdAt: now, updatedAt: now)
+
+        menuRepository.existsByName("Pizza") >> false
         menuRepository.save(_) >> savedItem
 
         when:
         def response = menuService.create(request)
 
         then:
-        // interaction verified by stub, no explicit count needed
         response.id == "abc123"
         response.name == "Pizza"
         response.description == "Delicious cheese pizza"
@@ -53,27 +46,26 @@ class MenuServiceTest extends Specification {
         response.createdAt != null
     }
 
-    def "should update an existing menu item successfully"() {
+    def "should throw MenuItemAlreadyExistsException when name is duplicate"() {
+        given:
+        def request = new MenuItemRequest(name: "Pizza", description: "desc", price: 9.99)
+        menuRepository.existsByName("Pizza") >> true
+
+        when:
+        menuService.create(request)
+
+        then:
+        def ex = thrown(MenuItemAlreadyExistsException)
+        ex.message == "Menu item already exists with name: Pizza"
+    }
+
+    def "should update menu item successfully"() {
         given:
         def id = "abc123"
-        def existingItem = new MenuItem(
-            id: id,
-            name: "Pizza",
-            description: "Delicious cheese pizza",
-            price: 9.99,
-            createdAt: LocalDateTime.now().minusHours(1),
-            updatedAt: LocalDateTime.now().minusHours(1)
-        )
-        def request = new MenuItemRequest(name: "Large Pizza", description: "Cheese pizza with extra toppings", price: 11.99)
-        def now = LocalDateTime.now()
-        def updatedItem = new MenuItem(
-            id: id,
-            name: request.name,
-            description: request.description,
-            price: request.price,
-            createdAt: existingItem.createdAt,
-            updatedAt: now
-        )
+        def existingItem = new MenuItem(id: id, name: "Pizza", description: "Old desc", price: 9.99, createdAt: LocalDateTime.now().minusHours(1), updatedAt: LocalDateTime.now().minusHours(1))
+        def request = new MenuItemRequest(name: "Large Pizza", description: "New desc", price: 11.99)
+        def updatedItem = new MenuItem(id: id, name: "Large Pizza", description: "New desc", price: 11.99, createdAt: existingItem.createdAt, updatedAt: LocalDateTime.now())
+
         menuRepository.findById(id) >> Optional.of(existingItem)
         menuRepository.save(_) >> updatedItem
 
@@ -81,62 +73,54 @@ class MenuServiceTest extends Specification {
         def response = menuService.update(id, request)
 
         then:
-        // repository methods are stubbed above, no need to verify interactions
         response.id == id
         response.name == "Large Pizza"
-        response.description == "Cheese pizza with extra toppings"
+        response.description == "New desc"
         response.price == 11.99
         response.updatedAt != null
     }
 
-    def "should throw exception when updating non-existent item"() {
+    def "should throw MenuItemNotFoundException when updating non-existent item"() {
         given:
-        def id = "non-existent"
-        def request = new MenuItemRequest(name: "Pizza", description: "Delicious cheese pizza", price: 9.99)
-        menuRepository.findById(id) >> Optional.empty()
+        menuRepository.findById("invalid") >> Optional.empty()
 
         when:
-        menuService.update(id, request)
+        menuService.update("invalid", new MenuItemRequest(name: "Pizza", description: "desc", price: 9.99))
 
         then:
-        thrown(RuntimeException)
+        def ex = thrown(MenuItemNotFoundException)
+        ex.message == "Menu item not found with id: invalid"
     }
 
-    def "should delete an existing menu item successfully"() {
+    def "should delete menu item successfully"() {
         given:
         def id = "abc123"
-        menuRepository.existsById(id) >> true
+        def item = new MenuItem(id: id, name: "Pizza", description: "desc", price: 9.99, createdAt: LocalDateTime.now(), updatedAt: LocalDateTime.now())
+        menuRepository.findById(id) >> Optional.of(item)
 
         when:
         menuService.delete(id)
 
         then:
-        // deletion should complete without throwing an exception
-        noExceptionThrown()
+        1 * menuRepository.delete(item)
     }
 
-    def "should throw exception when deleting non-existent item"() {
+    def "should throw MenuItemNotFoundException when deleting non-existent item"() {
         given:
-        def id = "non-existent"
-        menuRepository.existsById(id) >> false
+        menuRepository.findById("invalid") >> Optional.empty()
 
         when:
-        menuService.delete(id)
+        menuService.delete("invalid")
 
         then:
-        thrown(RuntimeException)
+        def ex = thrown(MenuItemNotFoundException)
+        ex.message == "Menu item not found with id: invalid"
     }
 
-    def "should find menu item by ID successfully"() {
+    def "should find menu item by id successfully"() {
         given:
         def id = "abc123"
-        def item = new MenuItem(
-            id: id,
-            name: "Pizza",
-            description: "Delicious cheese pizza",
-            price: 9.99,
-            createdAt: LocalDateTime.now()
-        )
+        def item = new MenuItem(id: id, name: "Pizza", description: "Delicious cheese pizza", price: 9.99, createdAt: LocalDateTime.now())
         menuRepository.findById(id) >> Optional.of(item)
 
         when:
@@ -150,23 +134,35 @@ class MenuServiceTest extends Specification {
         response.createdAt != null
     }
 
-    def "should throw exception when finding non-existent item by ID"() {
+    def "should throw MenuItemNotFoundException when finding non-existent item"() {
         given:
-        def id = "non-existent"
-        menuRepository.findById(id) >> Optional.empty()
+        menuRepository.findById("invalid") >> Optional.empty()
 
         when:
-        menuService.findById(id)
+        menuService.findById("invalid")
 
         then:
-        thrown(RuntimeException)
+        def ex = thrown(MenuItemNotFoundException)
+        ex.message == "Menu item not found with id: invalid"
     }
 
-    def "should return paginated list of items"() {
+    def "should return null createdAt when item has no createdAt"() {
+        given:
+        def item = new MenuItem(id: "abc123", name: "Pizza", description: "desc", price: 9.99, createdAt: null)
+        menuRepository.findById("abc123") >> Optional.of(item)
+
+        when:
+        def response = menuService.findById("abc123")
+
+        then:
+        response.createdAt == null
+    }
+
+    def "should return paginated list of menu items"() {
         given:
         def item1 = new MenuItem(id: "a", name: "A", description: "A", price: 1.0, createdAt: LocalDateTime.now())
         def item2 = new MenuItem(id: "b", name: "B", description: "B", price: 2.0, createdAt: LocalDateTime.now())
-        def page = new PageImpl<MenuItem>([item1, item2], PageRequest.of(0, 2), 2)
+        def page = new PageImpl<>([item1, item2], PageRequest.of(0, 2), 2)
         menuRepository.findAll(_ as PageRequest) >> page
 
         when:
@@ -177,5 +173,18 @@ class MenuServiceTest extends Specification {
         response.items.size() == 2
         response.items[0].id == "a"
         response.items[1].id == "b"
+    }
+
+    def "should calculate correct page number from offset"() {
+        given:
+        def page = new PageImpl<>([], PageRequest.of(1, 5), 10)
+        menuRepository.findAll(_ as PageRequest) >> page
+
+        when:
+        def response = menuService.findAll(5, 5)
+
+        then:
+        response.totalRecords == 10
+        response.items.size() == 0
     }
 }

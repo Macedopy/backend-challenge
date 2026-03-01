@@ -1,7 +1,8 @@
-package com.restaurant.pos.menuservice.menu
+package com.restaurant.pos.menuservice.menu.repository
 
 import com.restaurant.pos.menuservice.menu.entity.MenuItem
 import org.springframework.data.mongodb.repository.MongoRepository
 
 interface MenuRepository extends MongoRepository<MenuItem, String> {
+    boolean existsByName(String name)
 }

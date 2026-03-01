@@ -1,7 +1,7 @@
 package com.restaurant.pos.orderservice.order.controller
 
-import com.restaurant.pos.orderservice.order.OrderController
-import com.restaurant.pos.orderservice.order.OrderService
+import com.restaurant.pos.orderservice.order.controller.OrderController
+import com.restaurant.pos.orderservice.order.service.OrderService
 import com.restaurant.pos.orderservice.order.dto.OrderRequest
 import com.restaurant.pos.orderservice.order.dto.OrderResponse
 import com.restaurant.pos.orderservice.order.dto.OrderStatusUpdateRequest

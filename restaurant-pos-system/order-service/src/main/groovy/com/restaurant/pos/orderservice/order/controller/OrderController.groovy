@@ -1,8 +1,9 @@
-package com.restaurant.pos.orderservice.order
+package com.restaurant.pos.orderservice.order.controller
 
 import com.restaurant.pos.orderservice.order.dto.OrderRequest
 import com.restaurant.pos.orderservice.order.dto.OrderResponse
 import com.restaurant.pos.orderservice.order.dto.OrderStatusUpdateRequest
+import com.restaurant.pos.orderservice.order.service.OrderService
 import groovy.transform.CompileStatic
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
