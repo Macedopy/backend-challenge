@@ -18,7 +18,7 @@ restaurant-pos-system/
 ```
 
 ### Communication
-- **Synchronous**: Order Service fetches menu item details from Menu Service via REST (OpenFeign)
+- **Synchronous**: Order Service fetches menu item details from Menu Service via REST (RestTemplate)
 - **Asynchronous**: Order Service publishes a message to RabbitMQ when an order status changes, then consumes it to simulate customer notification by logging `fullName`, `address`, `email`, and the new `status`
 
 ### Infrastructure
@@ -106,7 +106,7 @@ curl -X DELETE http://localhost:8081/menu-items/{id}
 
 **Get All Menu Items (Paginated)**
 ```bash
-curl http://localhost:8081/menu-items?limit=10&offset=0
+curl "http://localhost:8081/menu-items?limit=10&offset=0"
 ```
 
 **Get Menu Item by ID**
@@ -146,7 +146,7 @@ curl -X PATCH http://localhost:8080/orders/{id}/status \
 
 **Get Order History (Paginated)**
 ```bash
-curl http://localhost:8080/orders?limit=10&offset=0
+curl "http://localhost:8080/orders?limit=10&offset=0"
 ```
 
 **Get Order by ID**
@@ -160,12 +160,17 @@ curl http://localhost:8080/orders/{id}
 
 | Technology | Version |
 |---|---|
-| Groovy / Spring Boot | 3.4.3 |
-| MongoDB | Latest |
-| RabbitMQ | Latest |
-| Docker / Docker Compose | — |
-| Spock Framework | 2.4 |
+| Java | 21 |
+| Groovy | 5.0.4 |
+| Spring Boot | 3.4.3 |
+| Spring Dependency Management | 1.1.7 |
+| Spring Data MongoDB | managed by Spring Boot 3.4.3 |
+| Spring AMQP (RabbitMQ) | managed by Spring Boot 3.4.3 |
+| MongoDB | latest |
+| RabbitMQ | latest |
+| Spock Framework | 2.4-groovy-5.0 |
 | JaCoCo | 0.8.12 |
+| Docker / Docker Compose | — |
 
 ---
 
@@ -178,11 +183,17 @@ Unit tests are implemented with **Spock Framework** covering:
 - Exception handlers (400, 404, 409, 500)
 
 ```bash
-# Run tests
+# Run tests — Menu Service
 cd menu-service && ./gradlew test
 
-# Run tests with coverage report
+# Run tests with coverage report — Menu Service
 cd menu-service && ./gradlew test jacocoTestReport
+
+# Run tests — Order Service
+cd order-service && ./gradlew test
+
+# Run tests with coverage report — Order Service
+cd order-service && ./gradlew test jacocoTestReport
 ```
 
 Coverage reports are available at `build/reports/jacoco/test/html/index.html`.
